@@ -14,7 +14,7 @@ BIN = $(BUILD_DIR)/$(MODULE)
 VERILATOR_FLAGS += -cc --exe -Wall --trace-fst --assert
 
 # Input files for Verilator
-VERILATOR_INPUT = $(shell find $(abspath ./vsrc) -name "*.v") ./csrc/${MODULE}_sim_v.cpp
+VERILATOR_INPUT = ./vsrc/${MODULE}.v ./csrc/${MODULE}_sim_v.cpp
 
 default: $(BIN)
 
@@ -52,10 +52,10 @@ run: $(BIN) # Should assign the MODULE
 sim: # Should also assign the MODULE to simulate
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
 	@echo "Write this Makefile by your self."
-	rm -rf obj_dir
-	$(VERILATOR) $(VERILATOR_FLAGS) $(VERILATOR_INPUT)
-	$(MAKE) -j -C obj_dir -f V${MODULE}.mk
-	obj_dir/V${MODULE} +trace
+	@rm -rf $(OBJ_DIR)
+	$(VERILATOR) $(VERILATOR_FLAGS) --Mdir $(OBJ_DIR) $(VERILATOR_INPUT)
+	$(MAKE) -j -C build/obj_dir -f V${MODULE}.mk
+	build/obj_dir/V${MODULE} +trace
 	gtkwave ${MODULE}_dump.fst
 # If you name your first waveform in the form of "module_dump.fst", it would be automatically opened.
 
